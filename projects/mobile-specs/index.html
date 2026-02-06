@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Full Mobile Specs Finder</title>
+<style>
+  /* ... styling similar to previous, dark mode, clean layout ... */
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    max-width: 720px;
+    margin: 20px auto;
+    background: #121212;
+    color: #e0e0e0;
+    padding: 15px;
+  }
+  h1 {
+    text-align: center;
+    color: #bb86fc;
+    margin-bottom: 25px;
+  }
+  label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 7px;
+    font-weight: 700;
+    color: #bb86fc;
+  }
+  select, input[type="text"] {
+    width: 100%;
+    padding: 11px;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+    background: #2c2c2c;
+    color: #e0e0e0;
+  }
+  select:disabled, input:disabled {
+    background: #1f1f1f;
+    color: #555;
+  }
+  ul {
+    list-style: none;
+    padding-left: 0;
+    max-height: 250px;
+    overflow-y: auto;
+    border-radius: 8px;
+    background: #1f1f1f;
+    margin-top: 12px;
+    box-shadow: 0 0 8px #bb86fcaa;
+  }
+  li {
+    padding: 12px;
+    border-bottom: 1px solid #333;
+    cursor: pointer;
+    transition: background 0.25s ease;
+  }
+  li:hover {
+    background: #bb86fc55;
+    color: #121212;
+  }
+  li:last-child {
+    border-bottom: none;
+  }
+  .details {
+    margin-top: 30px;
+    background: #292929;
+    padding: 22px;
+    border-radius: 14px;
+    box-shadow: 0 0 18px #bb86fcaa;
+  }
+  .details h2 {
+    margin-top: 0;
+    color: #bb86fc;
+  }
+  .details p {
+    margin: 7px 0;
+    font-size: 1.1rem;
+  }
+  .no-items {
+    padding: 18px;
+    text-align: center;
+    color: #777;
+  }
+</style>
+</head>
+<body>
+
+<h1>Full Mobile Specs Finder</h1>
+
+<label for="brandSelect">Select Brand</label>
+<select id="brandSelect">
+  <option value="">-- Choose Brand --</option>
+</select>
+
+<label for="seriesSelect">Select Series</label>
+<select id="seriesSelect" disabled>
+  <option value="">-- Choose Series --</option>
+</select>
+
+<label for="searchInput">Search Models</label>
+<input type="text" id="searchInput" placeholder="Type model name to search..." disabled />
+
+<ul id="modelList"></ul>
+
+<div id="phoneDetails" class="details" style="display:none;"></div>
+
+<script>
+  // Huge data object with many brands, series, and models with real or placeholder specs
+  const phoneData = {
+    "Samsung": {
+      "Galaxy S Series": {
+        "Galaxy S21 Ultra": {
+          processor: "Exynos 2100 / Snapdragon 888",
+          battery: 5000,
+          screen: "6.8\" Dynamic AMOLED 2X QHD+",
+          storage: "128GB / 256GB / 512GB"
+        },
+        "Galaxy S22": {
+          processor: "Exynos 2200 / Snapdragon 8 Gen 1",
+          battery: 3700,
+          screen: "6.1\" AMOLED FHD+",
+          storage: "128GB / 256GB"
+        },
+        "Galaxy S23 Ultra": {
+          processor: "Snapdragon 8 Gen 2",
+          battery: 5000,
+          screen: "6.8\" AMOLED QHD+",
+          storage: "256GB / 512GB / 1TB"
+        }
+      },
+      "Galaxy Note Series": {
+        "Note 20 Ultra": {
+          processor: "Exynos 990 / Snapdragon 865+",
+          battery: 4500,
+          screen: "6.9\" Dynamic AMOLED 2X",
+          storage: "128GB / 256GB / 512GB"
+        },
+        "Note 10": {
+          processor: "Exynos 9825 / Snapdragon 855",
+          battery: 3500,
+          screen: "6.3\" Dynamic AMOLED",
+          storage: "256GB"
+        }
+      },
+      "Galaxy A Series": {
+        "Galaxy A52": {
+          processor: "Snapdragon 720G",
+          battery: 4500,
+          screen: "6.5\" Super AMOLED FHD+",
+          storage: "128GB / 256GB"
+        },
+        "Galaxy A71": {
+          processor: "Snapdragon 730",
+          battery: 4500,
+          screen: "6.7\" Super AMOLED Plus",
+          storage: "128GB / 256GB"
+        },
+        "Galaxy A10": {
+          processor: "Exynos 7884",
+          battery: 3400,
+          screen: "6.2\" PLS TFT",
+          storage: "32GB"
+        }
+      }
+      // Add more series & phones...
+    },
+
+    "Xiaomi": {
+      "Mi Series": {
+        "Mi 11": {
+          processor: "Snapdragon 888",
+          battery: 4600,
+          screen: "6.81\" AMOLED QHD+",
+          storage: "128GB / 256GB"
+        },
+        "Mi 13": {
+          processor: "Snapdragon 8 Gen 2",
+          battery: 4500,
+          screen: "6.36\" AMOLED FHD+",
+          storage: "128GB / 256GB"
+        }
+      },
+      "Redmi Note Series": {
+        "Redmi Note 10": {
+          processor: "Snapdragon 678",
+          battery: 5000,
+          screen: "6.43\" AMOLED FHD+",
+          storage: "64GB / 128GB"
+        },
+        "Redmi Note 11": {
+          processor: "MediaTek Helio G88",
+          battery: 5000,
+          screen: "6.43\" AMOLED FHD+",
+          storage: "64GB / 128GB"
+        }
+      }
+      // More series & phones can be added here...
+    },
+
+    "OnePlus": {
+      "OnePlus 8 Series": {
+        "OnePlus 8": {
+          processor: "Snapdragon 865",
+          battery: 4300,
+          screen: "6.55\" Fluid AMOLED FHD+",
+          storage: "128GB / 256GB"
+        },
+        "OnePlus 8 Pro": {
+          processor: "Snapdragon 865",
+          battery: 4510,
+          screen: "6.78\" Fluid AMOLED QHD+",
+          storage: "128GB / 256GB / 512GB"
+        }
+      },
+      "OnePlus Nord Series": {
+        "OnePlus Nord 2": {
+          processor: "MediaTek Dimensity 1200",
+          battery: 4500,
+          screen: "6.43\" Fluid AMOLED FHD+",
+          storage: "128GB / 256GB"
+        }
+      }
+    },
+
+    // You can add more brands and models here following this pattern
+  };
+
+  const brandSelect = document.getElementById('brandSelect');
+  const seriesSelect = document.getElementById('seriesSelect');
+  const searchInput = document.getElementById('searchInput');
+  const modelList = document.getElementById('modelList');
+  const phoneDetails = document.getElementById('phoneDetails');
+
+  function populateBrands() {
+    for (const brand in phoneData) {
+      const option = document.createElement('option');
+      option.value = brand;
+      option.textContent = brand;
+      brandSelect.appendChild(option);
+    }
+  }
+
+  function populateSeries(brand) {
+    seriesSelect.innerHTML = '<option value="">-- Choose Series --</option>';
+    if (!brand) {
+      seriesSelect.disabled = true;
+      searchInput.disabled = true;
+      modelList.innerHTML = '';
+      phoneDetails.style.display = 'none';
+      return;
+    }
+    const seriesList = Object.keys(phoneData[brand]);
+    for (const series of seriesList) {
+      const option = document.createElement('option');
+      option.value = series;
+      option.textContent = series;
+      seriesSelect.appendChild(option);
+    }
+    seriesSelect.disabled = false;
+    searchInput.value = '';
+    searchInput.disabled = true;
+    modelList.innerHTML = '';
+    phoneDetails.style.display = 'none';
+  }
+
+  function renderModels() {
+    modelList.innerHTML = '';
+    phoneDetails.style.display = 'none';
+
+    const brand = brandSelect.value;
+    const series = seriesSelect.value;
+    if (!brand || !series) {
+      searchInput.disabled = true;
+      return;
+    }
+    searchInput.disabled = false;
+
+    const searchTerm = searchInput.value.trim().toLowerCase();
+    const modelsObj = phoneData[brand][series];
+    const filteredModels = Object.keys(modelsObj).filter(m => m.toLowerCase().includes(searchTerm));
+
+    if (filteredModels.length === 0) {
+      modelList.innerHTML = '<li class="no-items">No models found</li>';
+      return;
+    }
+
+    for (const model of filteredModels) {
+      const li = document.createElement('li');
+      li.textContent = model;
+      li.onclick = () => showDetails(modelsObj[model], model);
+      modelList.appendChild(li);
+    }
+  }
+
+  function showDetails(specs, modelName) {
+    phoneDetails.style.display = 'block';
+    phoneDetails.innerHTML = `
+      <h2>${modelName}</h2>
+      <p><strong>Processor:</strong> ${specs.processor || 'N/A'}</p>
+      <p><strong>Battery:</strong> ${specs.battery ? specs.battery + ' mAh' : 'N/A'}</p>
+      <p><strong>Screen:</strong> ${specs.screen || 'N/A'}</p>
+      <p><strong>Storage:</strong> ${specs.storage || 'N/A'}</p>
+    `;
+  }
+
+  brandSelect.addEventListener('change', () => {
+    populateSeries(brandSelect.value);
+  });
+
+  seriesSelect.addEventListener('change', () => {
+    renderModels();
+  });
+
+  searchInput.addEventListener('input', () => {
+    renderModels();
+  });
+
+  populateBrands();
+</script>
+
+</body>
+</html>

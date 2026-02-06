@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BGMI Highlights Generator Lite</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; background: #222; color: #eee; }
+  input, button, textarea { margin: 10px 0; padding: 10px; width: 100%; max-width: 400px; }
+  button { cursor: pointer; background: #28a745; color: white; border: none; font-weight: bold; }
+  video { max-width: 100%; margin-top: 20px; border: 2px solid #444; }
+  label { font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>BGMI Clip Highlights Generator Lite</h1>
+
+<label for="videoInput">Upload Video (MP4):</label>
+<input type="file" id="videoInput" accept="video/mp4" />
+
+<label for="timestamps">Highlight Timestamps (seconds, comma separated):</label>
+<textarea id="timestamps" rows="2" placeholder="e.g. 45, 120, 250"></textarea>
+
+<button id="generateBtn">Generate Highlights</button>
+
+<p id="status">Status: Waiting for input</p>
+
+<video id="resultVideo" controls></video>
+
+<script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.8/dist/ffmpeg.min.js"></script>
+<script>
+  const { createFFmpeg, fetchFile } = FFmpeg;
+  const ffmpeg = createFFmpeg({ log: true });
+  const generateBtn = document.getElementById('generateBtn');
+  const status = document.getElementById('status');
+  const videoInput = document.getElementById('videoInput');
+  const timestampsInput = document.getElementById('timestamps');
+  const resultVideo = document.getElementById('resultVideo');
+
+  generateBtn.onclick = async () => {
+    if (!videoInput.files.length) {
+      alert('Please upload a video file!');
+      return;
+    }
+    const timestampsRaw = timestampsInput.value.trim();
+    if (!timestampsRaw) {
+      alert('Please enter highlight timestamps!');
+      return;
+    }
+
+    const timestamps = timestampsRaw.split(',').map(t => parseFloat(t.trim())).filter(t => !isNaN(t));
+    if (timestamps.length === 0) {
+      alert('Please enter valid timestamps!');
+      return;
+    }
+
+    try {
+      status.textContent = 'Loading FFmpeg...';
+      if (!ffmpeg.isLoaded()) {
+        await ffmpeg.load();
+      }
+
+      status.textContent = 'Writing input video to memory...';
+      const file = videoInput.files[0];
+      await ffmpeg.FS('writeFile', 'input.mp4', await fetchFile(file));
+
+      const clipDuration = 5; // shorter clips for testing
+      const halfDuration = clipDuration / 2;
+
+      status.textContent = 'Extracting clips...';
+      let concatList = '';
+      for (let i = 0; i < timestamps.length; i++) {
+        let start = Math.max(timestamps[i] - halfDuration, 0);
+        let outputName = `clip${i}.mp4`;
+
+        await ffmpeg.run(
+          '-ss', start.toString(),
+          '-i', 'input.mp4',
+          '-t', clipDuration.toString(),
+          '-c', 'copy',
+          outputName
+        );
+
+        concatList += `file '${outputName}'\n`;
+        status.textContent = `Extracted clip ${i + 1} of ${timestamps.length}`;
+      }
+
+      ffmpeg.FS('writeFile', 'concat.txt', concatList);
+
+      status.textContent = 'Concatenating clips...';
+
+      await ffmpeg.run(
+        '-f', 'concat',
+        '-safe', '0',
+        '-i', 'concat.txt',
+        '-c', 'copy',
+        'output.mp4'
+      );
+
+      status.textContent = 'Generating final video...';
+
+      const data = ffmpeg.FS('readFile', 'output.mp4');
+
+      const videoBlob = new Blob([data.buffer], { type: 'video/mp4' });
+      const videoURL = URL.createObjectURL(videoBlob);
+      resultVideo.src = videoURL;
+
+      status.textContent = 'Highlight video generated!';
+
+    } catch (e) {
+      status.textContent = 'Error: ' + e.message;
+      console.error(e);
+    }
+  };
+</script>
+
+</body>
+</html>

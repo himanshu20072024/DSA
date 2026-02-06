@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #87ceeb, #f0f8ff); /* Sky blue gradient */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .weather-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0.3);
+            width: 320px;
+            transition: background 0.3s;
+        }
+
+        .weather-container h1 {
+            margin-bottom: 20px;
+            color: #1e90ff;
+        }
+
+        input {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #1e90ff;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #0b6edb;
+        }
+
+        #weatherResult {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        #weatherResult img {
+            width: 64px;
+            height: 64px;
+        }
+    </style>
+</head>
+<body>
+    <div class="weather-container">
+        <h1>Weather App</h1>
+        <input type="text" id="locationInput" placeholder="Enter city name">
+        <button id="getWeatherBtn">Get Weather</button>
+        <div id="weatherResult">
+            <!-- Weather info will appear here -->
+        </div>
+    </div>
+
+    <script>
+        const apiKey = "60a81b555d7b4a798d1140939250209"; // Your WeatherAPI key
+        const getWeatherBtn = document.getElementById("getWeatherBtn");
+        const locationInput = document.getElementById("locationInput");
+        const weatherResult = document.getElementById("weatherResult");
+
+        getWeatherBtn.addEventListener("click", () => {
+            const location = locationInput.value.trim();
+            if(location === "") {
+                alert("Please enter a location");
+                return;
+            }
+
+            const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${location}&aqi=yes`;
+
+            fetch(url)
+            .then(response => {
+                if(!response.ok) {
+                    throw new Error("Location not found");
+                }
+                return response.json();
+            })
+            .then(data => {
+                const name = data.location.name;
+                const country = data.location.country;
+                const tempC = data.current.temp_c;
+                const tempF = data.current.temp_f;
+                const condition = data.current.condition.text;
+                const icon = data.current.condition.icon;
+
+                weatherResult.innerHTML = `
+                    <h2>${name}, ${country}</h2>
+                    <img src="${icon}" alt="${condition}">
+                    <p>Temperature: ${tempC}°C / ${tempF}°F</p>
+                    <p>Condition: ${condition}</p>
+                `;
+
+                // Optional: Change container background based on weather
+                const container = document.querySelector('.weather-container');
+                if(condition.toLowerCase().includes("rain")) {
+                    container.style.background = "rgba(173, 216, 230, 0.95)"; // Light blue
+                } else if(condition.toLowerCase().includes("cloud")) {
+                    container.style.background = "rgba(211, 211, 211, 0.95)"; // Light gray
+                } else if(condition.toLowerCase().includes("sun") || condition.toLowerCase().includes("clear")) {
+                    container.style.background = "rgba(255, 223, 186, 0.95)"; // Sunny yellow
+                } else {
+                    container.style.background = "rgba(255, 255, 255, 0.95)";
+                }
+            })
+            .catch(error => {
+                weatherResult.innerHTML = `<p style="color:red;">${error.message}</p>`;
+            });
+        });
+
+        // Optional: Allow pressing Enter key to fetch weather
+        locationInput.addEventListener("keypress", (e) => {
+            if(e.key === "Enter") {
+                getWeatherBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>

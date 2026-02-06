@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Himanshu Kumar - Academic Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #0073e6;
+            color: white;
+            padding: 20px;
+            font-size: 24px;
+        }
+        .container {
+            margin: 20px auto;
+            width: 80%;
+            max-width: 600px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .academic-year {
+            margin: 10px 0;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            margin-top: 15px;
+            background-color: #0073e6;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #005bb5;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        Himanshu Kumar
+    </header>
+    <div class="container">
+        <h2>Academic Details</h2>
+        <form id="academicForm">
+            <div class="academic-year">Class 8: <input type="text" id="class8"></div>
+            <div class="academic-year">Class 9: <input type="text" id="class9"></div>
+            <div class="academic-year">Class 10: <input type="text" id="class10"></div>
+            <div class="academic-year">Class 11: <input type="text" id="class11"></div>
+            <div class="academic-year">Class 12: <input type="text" id="class12"></div>
+            <div class="academic-year">B.Tech 1st Year: <input type="text" id="btech1"></div>
+            <div class="academic-year">B.Tech 2nd Year: <input type="text" id="btech2"></div>
+            <div class="academic-year">B.Tech 3rd Year: <input type="text" id="btech3"></div>
+            <div class="academic-year">B.Tech 4th Year: <input type="text" id="btech4"></div>
+            <button type="button" onclick="saveData()">Save Details</button>
+        </form>
+    </div>
+    <script>
+        function saveData() {
+            let academicDetails = {
+                class8: document.getElementById("class8").value,
+                class9: document.getElementById("class9").value,
+                class10: document.getElementById("class10").value,
+                class11: document.getElementById("class11").value,
+                class12: document.getElementById("class12").value,
+                btech1: document.getElementById("btech1").value,
+                btech2: document.getElementById("btech2").value,
+                btech3: document.getElementById("btech3").value,
+                btech4: document.getElementById("btech4").value
+            };
+            localStorage.setItem("academicDetails", JSON.stringify(academicDetails));
+            alert("Details Saved Successfully!");
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Clash of Clans War Simulator - Addictive Edition</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+
+    body {
+      background: #121212;
+      color: #e0e0e0;
+      font-family: 'Orbitron', sans-serif;
+      margin: 0;
+      padding: 20px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    h1 {
+      text-align: center;
+      font-weight: 900;
+      margin-bottom: 0;
+      letter-spacing: 3px;
+      color: #ffcc00;
+      text-shadow: 0 0 8px #ffcc00;
+    }
+
+    .container {
+      background: #1e1e1e;
+      border-radius: 15px;
+      padding: 20px;
+      margin-top: 20px;
+      box-shadow: 0 0 15px #ffcc00a0;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: 700;
+      font-size: 1.1em;
+    }
+
+    input[type="number"] {
+      width: 70px;
+      padding: 8px;
+      font-size: 1em;
+      border-radius: 8px;
+      border: none;
+      margin-right: 15px;
+      background: #333;
+      color: #eee;
+      text-align: center;
+      transition: background 0.3s ease;
+    }
+    input[type="number"]:focus {
+      background: #444;
+      outline: none;
+    }
+
+    .troop-group {
+      margin-bottom: 20px;
+    }
+
+    button {
+      background: #ffcc00;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 30px;
+      font-size: 1.2em;
+      font-weight: 700;
+      cursor: pointer;
+      color: #121212;
+      box-shadow: 0 0 10px #ffcc00aa;
+      transition: background 0.3s ease;
+      margin-top: 10px;
+      width: 100%;
+    }
+    button:hover {
+      background: #ffd633;
+    }
+
+    .result {
+      margin-top: 25px;
+      background: #222;
+      border-radius: 15px;
+      padding: 15px;
+      box-shadow: 0 0 10px #ffcc00aa;
+    }
+
+    .progress-bar {
+      background: #444;
+      border-radius: 20px;
+      overflow: hidden;
+      margin: 10px 0 20px 0;
+      height: 25px;
+    }
+    .progress-bar-inner {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #f39c12, #f1c40f);
+      transition: width 1.5s ease;
+      text-align: center;
+      line-height: 25px;
+      font-weight: 700;
+      color: #121212;
+      user-select: none;
+      border-radius: 20px;
+      box-shadow: inset 0 0 10px #fff5c1aa;
+    }
+
+    .log {
+      background: #111;
+      max-height: 200px;
+      overflow-y: auto;
+      border-radius: 12px;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 0.9em;
+      margin-top: 15px;
+      border: 1px solid #444;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 0.9em;
+      color: #666;
+    }
+
+    @media (max-width: 500px) {
+      input[type="number"] {
+        width: 50px;
+        margin-right: 8px;
+      }
+      button {
+        font-size: 1em;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Clash of Clans War Simulator</h1>
+
+  <div class="container">
+    <form id="battleForm">
+      <div class="troop-group">
+        <h2>Attacker Troops</h2>
+        <label>Barbarians <input type="number" id="attBarb" min="0" value="10" title="Health: 100, Damage: 30"></label>
+        <label>Archers <input type="number" id="attArch" min="0" value="10" title="Health: 70, Damage: 40"></label>
+        <label>Giants <input type="number" id="attGiant" min="0" value="5" title="Health: 300, Damage: 20"></label>
+        <label>Wizards <input type="number" id="attWizard" min="0" value="3" title="Health: 150, Damage: 80"></label>
+        <label>Dragons <input type="number" id="attDragon" min="0" value="1" title="Health: 1000, Damage: 150"></label>
+      </div>
+
+      <div class="troop-group">
+        <h2>Defender Troops</h2>
+        <label>Barbarians <input type="number" id="defBarb" min="0" value="10" title="Health: 100, Damage: 30"></label>
+        <label>Archers <input type="number" id="defArch" min="0" value="10" title="Health: 70, Damage: 40"></label>
+        <label>Giants <input type="number" id="defGiant" min="0" value="5" title="Health: 300, Damage: 20"></label>
+        <label>Wizards <input type="number" id="defWizard" min="0" value="3" title="Health: 150, Damage: 80"></label>
+        <label>Dragons <input type="number" id="defDragon" min="0" value="1" title="Health: 1000, Damage: 150"></label>
+      </div>
+
+      <button type="submit">Simulate Battle</button>
+    </form>
+
+    <div class="result" id="result" style="display:none;">
+      <h2>Battle Result</h2>
+
+      <div>
+        <strong>Winner:</strong> <span id="winnerText"></span>
+      </div>
+
+      <div>
+        <strong>Attacker Survival:</strong>
+        <div class="progress-bar"><div id="attackerBar" class="progress-bar-inner">0%</div></div>
+      </div>
+
+      <div>
+        <strong>Defender Survival:</strong>
+        <div class="progress-bar"><div id="defenderBar" class="progress-bar-inner">0%</div></div>
+      </div>
+
+      <h3>Battle Log</h3>
+      <div class="log" id="battleLog"></div>
+    </div>
+  </div>
+
+  <div class="footer">Made with ❤️ for Clash of Clans fans</div>
+
+  <script>
+    const troopStats = {
+      barbarian: { health: 100, damage: 30 },
+      archer: { health: 70, damage: 40 },
+      giant: { health: 300, damage: 20 },
+      wizard: { health: 150, damage: 80 },
+      dragon: { health: 1000, damage: 150 }
+    };
+
+    function simulateBattle(attacker, defender) {
+      const logLines = [];
+
+      // Calculate total health and damage for attacker and defender
+      function totalHealth(troops) {
+        return Object.entries(troops).reduce((sum, [troop, count]) => sum + troopStats[troop].health * count, 0);
+      }
+      function totalDamage(troops) {
+        return Object.entries(troops).reduce((sum, [troop, count]) => sum + troopStats[troop].damage * count, 0);
+      }
+
+      let attHealth = totalHealth(attacker);
+      let defHealth = totalHealth(defender);
+
+      let attDamage = totalDamage(attacker);
+      let defDamage = totalDamage(defender);
+
+      logLines.push(`Attacker total health: ${attHealth}`);
+      logLines.push(`Defender total health: ${defHealth}`);
+      logLines.push(`Attacker total damage: ${attDamage}`);
+      logLines.push(`Defender total damage: ${defDamage}`);
+
+      // Simulate simple damage exchange over rounds (max 5 rounds)
+      let rounds = 5;
+      for(let i = 1; i <= rounds; i++) {
+        defHealth -= attDamage * 0.2; // attackers hit defenders
+        attHealth -= defDamage * 0.2; // defenders hit attackers
+
+        defHealth = Math.max(defHealth, 0);
+        attHealth = Math.max(attHealth, 0);
+
+        logLines.push(`Round ${i}: Attacker health = ${attHealth.toFixed(0)}, Defender health = ${defHealth.toFixed(0)}`);
+
+        if(attHealth <= 0 || defHealth <= 0) break;
+      }
+
+      let attSurvival = attHealth / totalHealth(attacker) || 0;
+      let defSurvival = defHealth / totalHealth(defender) || 0;
+
+      let winner = 'Draw';
+      if (attSurvival > defSurvival) winner = 'Attacker Wins!';
+      else if (defSurvival > attSurvival) winner = 'Defender Wins!';
+
+      return {
+        attackerSurvivalPercent: (attSurvival * 100).toFixed(1),
+        defenderSurvivalPercent: (defSurvival * 100).toFixed(1),
+        winner,
+        logLines
+      };
+    }
+
+    document.getElementById('battleForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const attacker = {
+        barbarian: Number(document.getElementById('attBarb').value),
+        archer: Number(document.getElementById('attArch').value),
+        giant: Number(document.getElementById('attGiant').value),
+        wizard: Number(document.getElementById('attWizard').value),
+        dragon: Number(document.getElementById('attDragon').value)
+      };
+
+      const defender = {
+        barbarian: Number(document.getElementById('defBarb').value),
+        archer: Number(document.getElementById('defArch').value),
+        giant: Number(document.getElementById('defGiant').value),
+        wizard: Number(document.getElementById('defWizard').value),
+        dragon: Number(document.getElementById('defDragon').value)
+      };
+
+      // Validate input: all counts >=0
+      for (const key of Object.keys(attacker)) {
+        if (attacker[key] < 0) attacker[key] = 0;
+      }
+      for (const key of Object.keys(defender)) {
+        if (defender[key] < 0) defender[key] = 0;
+      }
+
+      const result = simulateBattle(attacker, defender);
+
+      document.getElementById('winnerText').textContent = result.winner;
+
+      const attBar = document.getElementById('attackerBar');
+      const defBar = document.getElementById('defenderBar');
+
+      attBar.style.width = '0%';
+      defBar.style.width = '0%';
+      attBar.textContent = '0%';
+      defBar.textContent = '0%';
+
+      // Animate progress bars
+      setTimeout(() => {
+        attBar.style.width = result.attackerSurvivalPercent + '%';
+        attBar.textContent = result.attackerSurvivalPercent + '%';
+
+        defBar.style.width = result.defenderSurvivalPercent + '%';
+        defBar.textContent = result.defenderSurvivalPercent + '%';
+      }, 100);
+
+      // Show battle log
+      const logDiv = document.getElementById('battleLog');
+      logDiv.innerHTML = '';
+      for (const line of result.logLines) {
+        const p = document.createElement('p');
+        p.textContent = line;
+        logDiv.appendChild(p);
+      }
+
+      document.getElementById('result').style.display = 'block';
+    });
+  </script>
+</body>
+</html>

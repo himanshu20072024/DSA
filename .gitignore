@@ -1,0 +1,7 @@
+web d/images/
+*.mp4
+*.exe
+*.zip
+*.pdf
+.vscode/
+

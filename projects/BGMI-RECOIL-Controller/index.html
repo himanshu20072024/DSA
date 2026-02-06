@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>BGMI Recoil Analyzer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>BGMI Recoil Analyzer</h1>
+
+  <div class="container">
+    <label for="category">Select Category:</label>
+    <select id="category" onchange="updateWeapons()">
+      <option value="">-- Choose Category --</option>
+      <option value="AR">Assault Rifles (AR)</option>
+      <option value="SMG">Submachine Guns (SMG)</option>
+      <option value="DMR">DMR</option>
+      <option value="Sniper">Sniper Rifles</option>
+      <option value="LMG">Light Machine Guns (LMG)</option>
+    </select>
+
+    <label for="weapon">Select Weapon:</label>
+    <select id="weapon"></select>
+
+    <label for="scope">Select Scope:</label>
+    <select id="scope">
+      <option value="1x">1x</option>
+      <option value="3x">3x</option>
+      <option value="6x">6x</option>
+    </select>
+
+    <label for="sensitivity">Sensitivity (0–100):</label>
+    <input type="range" id="sensitivity" min="0" max="100" value="50" />
+    <span id="sensitivityValue">50</span>
+
+    <button onclick="analyze()">Analyze Recoil</button>
+  </div>
+
+  <div id="weaponImage"></div>
+  <canvas id="recoilCanvas" width="400" height="400"></canvas>
+
+  <script src="script.js"></script>
+</body>
+</html>
