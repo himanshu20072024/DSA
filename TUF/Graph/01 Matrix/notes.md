@@ -5,3 +5,6 @@ yea folks this one question i would say some difficulty is there
 
 simply i am saying that if you are using space go all in and write a very good code which uses separate space for each things and if not then  dont use a single space that all !!!!
 
+using 2 loops method:
+time: 2*O(M*N)
+space: O(M*N);
